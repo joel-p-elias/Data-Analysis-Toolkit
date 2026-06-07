@@ -52,5 +52,5 @@ streamlit run app.py
 
 **Joel Payyappilly Elias**
 
-## Acknowledgements
+### Acknowledgements
 Developed with AI-assisted tooling.
