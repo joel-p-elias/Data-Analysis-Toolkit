@@ -1,6 +1,10 @@
 # Data Analysis Toolkit
 
-Data Analysis Toolkit is a Streamlit based statistical analysis platform designed for students, researchers, and educators.
+A Streamlit-based statistical analysis platform designed for students, researchers, and educators.
+
+🔗 **[Live Demo](https://your-app-url.streamlit.app)**
+
+---
 
 ## Features
 
@@ -25,24 +29,25 @@ Data Analysis Toolkit is a Streamlit based statistical analysis platform designe
 
 Students, researchers, educators, and anyone requiring a user-friendly statistical analysis environment.
 
-## Author
-
-Joel Payyappilly Elias
-
 ## Technologies
 
-- Python
-- Streamlit
-- Pandas
-- NumPy
-- SciPy
-- Statsmodels
-- Matplotlib
-- Seaborn
-- ReportLab
+| Layer - Libraries 
+| Language - Python 
+| UI - Streamlit 
+| Data - Pandas, NumPy 
+| Statistics - SciPy, Statsmodels 
+| Visualisation - Matplotlib, Seaborn 
+| Reporting - ReportLab 
 
 ## Run Locally
 
 ```bash
+git clone https://github.com/joel-p-elias/Data-Analysis-Toolkit.git
+cd Data-Analysis-Toolkit
 pip install -r requirements.txt
 streamlit run app.py
+```
+
+## Author
+
+**Joel Payyappilly Elias**
