@@ -26,11 +26,11 @@ A comprehensive statistical analysis and visualization platform built with Strea
 
 ## Intended Users
 
-Students, researchers, educators, and anyone requiring a user-friendly statistical analysis environment.
+Students, researchers, educators, and anyone requiring a simple user friendly statistical analysis environment.
 
 ## Author
 
-Joel P. Elias
+joel Payyapppilly Elias
 
 ## Technologies
 
