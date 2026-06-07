@@ -31,12 +31,12 @@ Students, researchers, educators, and anyone requiring a user-friendly statistic
 
 ## Technologies
 
-| Layer - Libraries 
-| Language - Python 
-| UI - Streamlit 
-| Data - Pandas, NumPy 
-| Statistics - SciPy, Statsmodels 
-| Visualisation - Matplotlib, Seaborn 
+| Layer - Libraries <br>
+| Language - Python <br>
+| UI - Streamlit <br>
+| Data - Pandas, NumPy <br>
+| Statistics - SciPy, Statsmodels <br>
+| Visualisation - Matplotlib, Seaborn <br>
 | Reporting - ReportLab 
 
 ## Run Locally
