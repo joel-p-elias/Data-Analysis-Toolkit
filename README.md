@@ -2,7 +2,7 @@
 
 A Streamlit-based statistical analysis platform designed for students, researchers, and educators.
 
-🔗 **[Live Demo](https://your-app-url.streamlit.app)**
+🔗 **[Live Demo](https://data-analysis-toolkit-joel-payyappilly-elias.streamlit.app/)**
 
 ---
 
