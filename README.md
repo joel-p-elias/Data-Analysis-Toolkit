@@ -4,6 +4,7 @@ A Streamlit-based statistical analysis platform designed for students, researche
 
 🔗 **[Live Demo](https://data-analysis-toolkit-joel-payyappilly-elias.streamlit.app/)**
 
+### FOR DETAILED DOCUMENTATION DOWNLOAD THE "DOCUMENTATION.PDF"
 ---
 
 ## Features
