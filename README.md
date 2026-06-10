@@ -2,8 +2,8 @@
 
 A Streamlit-based statistical analysis platform designed for students, researchers, and educators.
 
-**[Live Demo](https://data-analysis-toolkit-joel-payyappilly-elias.streamlit.app/)** <br>
-**Sample dataset:[Titanic Dataset](https://www.kaggle.com/datasets/yasserh/titanic-dataset)**
+**Webapp [Live Demo](https://data-analysis-toolkit-joel-payyappilly-elias.streamlit.app/)** <br>
+**Sample dataset: [Titanic Dataset](https://www.kaggle.com/datasets/yasserh/titanic-dataset)**
 
 ### FOR DETAILED DOCUMENTATION DOWNLOAD THE "DOCUMENTATION.PDF"
 ---
