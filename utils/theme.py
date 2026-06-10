@@ -1190,7 +1190,7 @@ def render_navigation_sidebar(active_page: str) -> None:
     with st.sidebar:
         st.markdown(
             '''<div class="sidebar-icon-header">
-                <a href="/" target="_self" class="sidebar-icon-link">
+                <a href="#" onclick="return false;" class="sidebar-icon-link">
                     <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect width="38" height="38" rx="10" fill="#111827"/>
                         <rect width="38" height="38" rx="10" fill="url(#grad)" opacity="0.18"/>
