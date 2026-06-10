@@ -60,12 +60,44 @@ with tab_fit:
         if st.button("Fit normal distribution"):
             try:
                 result = fit_normal(df[column])
-                st.json(result)
+
+                # Fitted parameters
+                st.subheader("Fitted Parameters")
+                col1, col2 = st.columns(2)
+                col1.metric("Fitted Mean", f"{result['mean']:.4f}")
+                col2.metric("Fitted Std Dev", f"{result['std']:.4f}")
+
+                # Goodness-of-fit summary table
+                st.subheader("Goodness-of-Fit Summary")
+                import pandas as pd
+                gof_decision = "Good fit" if result["ks_p_value"] >= 0.05 else "Poor fit"
+                gof_df = pd.DataFrame({
+                    "Measure": [
+                        "Test",
+                        "KS Statistic (D)",
+                        "p-value",
+                        "Alpha",
+                        "Decision",
+                        "Interpretation",
+                    ],
+                    "Value": [
+                        "Kolmogorov-Smirnov (fitted normal)",
+                        f"{result['ks_statistic']:.4f}",
+                        f"{result['ks_p_value']:.4f}",
+                        "0.05",
+                        gof_decision,
+                        "Fail to reject H0 — normal fit is plausible." if result["ks_p_value"] >= 0.05
+                        else "Reject H0 — data deviates significantly from a normal distribution.",
+                    ],
+                })
+                st.dataframe(gof_df, use_container_width=True, hide_index=True)
+
+                if result["ks_p_value"] < 0.05:
+                    st.warning("The KS test suggests the normal fit may be poor (p < 0.05). The data may follow a different distribution.")
+                else:
+                    st.success("The fitted normal distribution is plausible by the KS test (p ≥ 0.05).")
+
                 fig = histogram_with_normal_curve(df[column])
                 show_figure_with_download(fig, f"fitted_normal_{column}")
-                if result["ks_p_value"] < 0.05:
-                    st.warning("The Kolmogorov-Smirnov test suggests the normal fit may be poor.")
-                else:
-                    st.success("The fitted normal distribution is plausible by the Kolmogorov-Smirnov test.")
             except Exception as exc:
                 st.error(str(exc))
