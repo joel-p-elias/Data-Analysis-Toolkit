@@ -63,3 +63,14 @@ if st.button("Apply cleaning", type="primary"):
 
 st.subheader("Cleaned Preview")
 st.dataframe(st.session_state.dataset.head(50), use_container_width=True)
+
+st.subheader("Export Dataset")
+export_df = st.session_state.dataset
+csv_data = export_df.to_csv(index=False).encode("utf-8")
+name = (st.session_state.dataset_name or "dataset").replace(".csv", "").replace(".xlsx", "").replace(".xls", "")
+st.download_button(
+    label="Download cleaned dataset as CSV",
+    data=csv_data,
+    file_name=f"{name}_cleaned.csv",
+    mime="text/csv",
+)
