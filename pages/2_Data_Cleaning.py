@@ -23,6 +23,23 @@ st.caption("Choose how missing values and duplicates should be handled.")
 st.subheader("Current Missing Values")
 st.dataframe(missing_value_table(df), use_container_width=True)
 
+st.subheader("Column Selection")
+st.caption("Choose which columns to keep before cleaning. Unselected columns will be dropped.")
+all_columns = df.columns.tolist()
+selected_columns = st.multiselect(
+    "Columns to keep",
+    options=all_columns,
+    default=all_columns,
+    key="selected_columns",
+    help="All columns selected by default. Deselect any you want to remove before cleaning.",
+)
+if len(selected_columns) == 0:
+    st.warning("At least one column must be selected.")
+    st.stop()
+if len(selected_columns) < len(all_columns):
+    dropped = [c for c in all_columns if c not in selected_columns]
+    st.info(f"Will drop {len(dropped)} column(s): {', '.join(dropped)}")
+
 strategy = st.radio(
     "Missing-value method",
     MISSING_VALUE_STRATEGIES,
@@ -42,6 +59,11 @@ columns_to_convert = st.multiselect(
 if st.button("Apply cleaning", type="primary"):
     cleaned = df.copy()
     actions = []
+
+    if len(selected_columns) < len(all_columns):
+        dropped_cols = [c for c in all_columns if c not in selected_columns]
+        cleaned = cleaned[selected_columns]
+        actions.append(f"Dropped {len(dropped_cols)} column(s): {', '.join(dropped_cols)}")
 
     if columns_to_convert:
         cleaned = coerce_columns_to_numeric(cleaned, columns_to_convert)
@@ -63,14 +85,3 @@ if st.button("Apply cleaning", type="primary"):
 
 st.subheader("Cleaned Preview")
 st.dataframe(st.session_state.dataset.head(50), use_container_width=True)
-
-st.subheader("Export Dataset")
-export_df = st.session_state.dataset
-csv_data = export_df.to_csv(index=False).encode("utf-8")
-name = (st.session_state.dataset_name or "dataset").replace(".csv", "").replace(".xlsx", "").replace(".xls", "")
-st.download_button(
-    label="Download cleaned dataset as CSV",
-    data=csv_data,
-    file_name=f"{name}_cleaned.csv",
-    mime="text/csv",
-)
