@@ -40,6 +40,7 @@ tabs = st.tabs(
         "Chi-square Independence",
         "Correlation",
         "Regression",
+        "Confidence Intervals",
     ]
 )
 
@@ -223,3 +224,139 @@ with tabs[8]:
                 show_figure_with_download(regression_plot(df, x=x, y=y), f"regression_{x}_{y}")
             except Exception as exc:
                 st.error(str(exc))
+
+with tabs[9]:
+    st.markdown("**Confidence Intervals**")
+    st.caption("Estimate the range likely to contain the true population parameter.")
+
+    ci_type = st.selectbox(
+        "Interval type",
+        ["One-sample mean (Z)", "One-sample mean (t)", "Difference of two means"],
+        key="ci_type",
+    )
+    confidence = st.slider("Confidence level (%)", min_value=80, max_value=99, value=95, step=1, key="ci_conf")
+    alpha_ci = 1 - confidence / 100
+
+    if ci_type == "One-sample mean (Z)":
+        st.caption("Use when population std (σ) is known and n ≥ 30.")
+        if not numeric_columns:
+            st.info("A numeric column is required.")
+        else:
+            col_ci = st.selectbox("Numeric column", numeric_columns, key="ci_z_col")
+            sigma = st.number_input("Known population std (σ)", min_value=0.0001, value=1.0, key="ci_z_sigma")
+            if st.button("Calculate Z confidence interval", key="btn_ci_z"):
+                try:
+                    from scipy import stats as scipy_stats
+                    import math
+                    values = df[col_ci].dropna().astype(float)
+                    n = len(values)
+                    xbar = float(values.mean())
+                    se = sigma / math.sqrt(n)
+                    z_crit = float(scipy_stats.norm.ppf(1 - alpha_ci / 2))
+                    lower = xbar - z_crit * se
+                    upper = xbar + z_crit * se
+                    col1, col2, col3 = st.columns(3)
+                    col1.metric("Sample mean", f"{xbar:.4f}")
+                    col2.metric("Standard error", f"{se:.4f}")
+                    col3.metric("Z critical value", f"{z_crit:.4f}")
+                    st.success(f"{confidence}% Confidence Interval: ({lower:.4f},  {upper:.4f})")
+                    st.markdown(f"**Interpretation:** We are {confidence}% confident the true population mean lies between **{lower:.4f}** and **{upper:.4f}**.")
+                    add_analysis({
+                        "test_name": f"{confidence}% CI for mean (Z)",
+                        "h0": "N/A", "ha": "N/A",
+                        "statistic_name": "Z critical",
+                        "statistic": z_crit,
+                        "p_value": alpha_ci,
+                        "degrees_of_freedom": None,
+                        "alpha": alpha_ci,
+                        "decision": f"CI: ({lower:.4f}, {upper:.4f})",
+                        "interpretation": f"{confidence}% confident true mean is between {lower:.4f} and {upper:.4f}.",
+                        "inputs": {"column": col_ci, "n": n, "sigma": sigma, "confidence": confidence},
+                    })
+                except Exception as exc:
+                    st.error(str(exc))
+
+    elif ci_type == "One-sample mean (t)":
+        st.caption("Use when population std (σ) is unknown — uses sample std and t-distribution.")
+        if not numeric_columns:
+            st.info("A numeric column is required.")
+        else:
+            col_ci = st.selectbox("Numeric column", numeric_columns, key="ci_t_col")
+            if st.button("Calculate t confidence interval", key="btn_ci_t"):
+                try:
+                    from scipy import stats as scipy_stats
+                    import math
+                    values = df[col_ci].dropna().astype(float)
+                    n = len(values)
+                    xbar = float(values.mean())
+                    s = float(values.std(ddof=1))
+                    se = s / math.sqrt(n)
+                    df_t = n - 1
+                    t_crit = float(scipy_stats.t.ppf(1 - alpha_ci / 2, df=df_t))
+                    lower = xbar - t_crit * se
+                    upper = xbar + t_crit * se
+                    col1, col2, col3, col4 = st.columns(4)
+                    col1.metric("Sample mean", f"{xbar:.4f}")
+                    col2.metric("Sample std", f"{s:.4f}")
+                    col3.metric("Standard error", f"{se:.4f}")
+                    col4.metric("t critical (df=" + str(df_t) + ")", f"{t_crit:.4f}")
+                    st.success(f"{confidence}% Confidence Interval: ({lower:.4f},  {upper:.4f})")
+                    st.markdown(f"**Interpretation:** We are {confidence}% confident the true population mean lies between **{lower:.4f}** and **{upper:.4f}**.")
+                    add_analysis({
+                        "test_name": f"{confidence}% CI for mean (t)",
+                        "h0": "N/A", "ha": "N/A",
+                        "statistic_name": "t critical",
+                        "statistic": t_crit,
+                        "p_value": alpha_ci,
+                        "degrees_of_freedom": df_t,
+                        "alpha": alpha_ci,
+                        "decision": f"CI: ({lower:.4f}, {upper:.4f})",
+                        "interpretation": f"{confidence}% confident true mean is between {lower:.4f} and {upper:.4f}.",
+                        "inputs": {"column": col_ci, "n": n, "sample_std": s, "confidence": confidence},
+                    })
+                except Exception as exc:
+                    st.error(str(exc))
+
+    else:
+        st.caption("Estimates the difference between two independent group means.")
+        if not numeric_columns or not categorical_columns:
+            st.info("A numeric outcome and categorical group column are required.")
+        else:
+            outcome_ci = st.selectbox("Numeric outcome", numeric_columns, key="ci_diff_outcome")
+            group_col_ci = st.selectbox("Group column", categorical_columns, key="ci_diff_group")
+            groups_ci = df[group_col_ci].dropna().unique().tolist()
+            if len(groups_ci) < 2:
+                st.info("The group column must contain at least two groups.")
+            else:
+                ga = st.selectbox("Group A", groups_ci, key="ci_diff_a")
+                gb = st.selectbox("Group B", [g for g in groups_ci if g != ga], key="ci_diff_b")
+                if st.button("Calculate difference CI", key="btn_ci_diff"):
+                    try:
+                        from scipy import stats as scipy_stats
+                        import math
+                        vals_a = df.loc[df[group_col_ci] == ga, outcome_ci].dropna().astype(float)
+                        vals_b = df.loc[df[group_col_ci] == gb, outcome_ci].dropna().astype(float)
+                        na, nb = len(vals_a), len(vals_b)
+                        xa, xb = float(vals_a.mean()), float(vals_b.mean())
+                        sa, sb = float(vals_a.std(ddof=1)), float(vals_b.std(ddof=1))
+                        se = math.sqrt(sa**2 / na + sb**2 / nb)
+                        num = (sa**2/na + sb**2/nb)**2
+                        den = (sa**2/na)**2/(na-1) + (sb**2/nb)**2/(nb-1)
+                        df_w = num / den
+                        t_crit = float(scipy_stats.t.ppf(1 - alpha_ci / 2, df=df_w))
+                        diff = xa - xb
+                        lower = diff - t_crit * se
+                        upper = diff + t_crit * se
+                        col1, col2, col3 = st.columns(3)
+                        col1.metric(f"Mean {ga}", f"{xa:.4f}")
+                        col2.metric(f"Mean {gb}", f"{xb:.4f}")
+                        col3.metric("Difference (A - B)", f"{diff:.4f}")
+                        st.success(f"{confidence}% CI for difference: ({lower:.4f},  {upper:.4f})")
+                        if lower > 0:
+                            st.markdown(f"**Interpretation:** We are {confidence}% confident that Group A has a higher mean than Group B. The difference is between {lower:.4f} and {upper:.4f}.")
+                        elif upper < 0:
+                            st.markdown(f"**Interpretation:** We are {confidence}% confident that Group B has a higher mean. The difference (A-B) is between {lower:.4f} and {upper:.4f}.")
+                        else:
+                            st.markdown(f"**Interpretation:** The CI contains zero — we cannot confidently say which group has a higher mean at the {confidence}% confidence level.")
+                    except Exception as exc:
+                        st.error(str(exc))
